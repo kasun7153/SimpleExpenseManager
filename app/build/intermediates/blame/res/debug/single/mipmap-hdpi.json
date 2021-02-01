@@ -1,5 +1,9 @@
 [
     {
+        "merged": "D:\\ACA\\Sem 4 My\\Database systems\\embedded mini project\\SimpleExpenseManager\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-hdpi\\ic_launcher.png",
+        "source": "D:\\ACA\\Sem 4 My\\Database systems\\embedded mini project\\SimpleExpenseManager\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher.png"
+    },
+    {
         "merged": "D:\\ACA\\Sem 4 My\\Database systems\\embedded mini project\\second\\SimpleExpenseManager\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-hdpi\\ic_launcher.png",
         "source": "D:\\ACA\\Sem 4 My\\Database systems\\embedded mini project\\second\\SimpleExpenseManager\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher.png"
     }

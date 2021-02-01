@@ -34,10 +34,10 @@ import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.ExpenseType;
  * This is an In-Memory implementation of the AccountDAO interface. This is not a persistent storage. A HashMap is
  * used to store the account details temporarily in the memory.
  */
-public class InMemoryAccountDAO implements AccountDAO {
+public class PersistentAccountDAO implements AccountDAO {
     private final Map<String, Account> accounts;
     FeedReaderDbHelper dbHelper;
-    public InMemoryAccountDAO(FeedReaderDbHelper dbHelper) {
+    public PersistentAccountDAO(FeedReaderDbHelper dbHelper) {
         this.dbHelper=dbHelper;
         this.accounts = new HashMap<>();
     }
@@ -60,21 +60,25 @@ public class InMemoryAccountDAO implements AccountDAO {
 
     @Override
     public List<Account> getAccountsList() {
-        return new ArrayList<>(accounts.values());
+        return new ArrayList<>();
     }
 
     @Override
     public Account getAccount(String accountNo) throws InvalidAccountException {
-        if (accounts.containsKey(accountNo)) {
-            return accounts.get(accountNo);
-        }
-        String msg = "Account " + accountNo + " is invalid.";
-        throw new InvalidAccountException(msg);
+        SQLiteDatabase db =this.dbHelper.getWritableDatabase();
+        Cursor res =  db.rawQuery( "select * from account_details", null );
+        return new Account(
+                res.getString(res.getColumnIndex("account_number")),
+                res.getString(res.getColumnIndex("bank")),
+                res.getString(res.getColumnIndex("account_holder")),
+                Double.valueOf(res.getString(res.getColumnIndex("balance")))
+        );
     }
 
     @Override
     public void addAccount(Account account) {
         SQLiteDatabase db =this.dbHelper.getWritableDatabase();
+
         ContentValues values = new ContentValues();
         values.put("account_number", account.getAccountNo());
         values.put("bank", account.getBankName());
@@ -90,11 +94,8 @@ public class InMemoryAccountDAO implements AccountDAO {
 
     @Override
     public void removeAccount(String accountNo) throws InvalidAccountException {
-        if (!accounts.containsKey(accountNo)) {
-            String msg = "Account " + accountNo + " is invalid.";
-            throw new InvalidAccountException(msg);
-        }
-        accounts.remove(accountNo);
+        SQLiteDatabase db= dbHelper.getReadableDatabase();
+        db.rawQuery( "delete from account_details where account_number=? ", new String[] {accountNo} );
     }
 
     @Override
