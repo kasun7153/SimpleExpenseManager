@@ -1,0 +1,4 @@
+#Mon Feb 01 16:54:32 IST 2021
+base.0=D\:\\ACA\\Sem 4 My\\Database systems\\embedded mini project\\second\\SimpleExpenseManager\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\1f\\main
+renamed.0=classes.dex
+file.0=D\:\\ACA\\Sem 4 My\\Database systems\\embedded mini project\\second\\SimpleExpenseManager\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\1f\\main\\classes.dex

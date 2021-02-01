@@ -20,7 +20,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.FeedReaderDbHelper;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.AccountDAO;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.exception.InvalidAccountException;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.Account;
@@ -32,14 +36,26 @@ import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.ExpenseType;
  */
 public class InMemoryAccountDAO implements AccountDAO {
     private final Map<String, Account> accounts;
-
-    public InMemoryAccountDAO() {
+    FeedReaderDbHelper dbHelper;
+    public InMemoryAccountDAO(FeedReaderDbHelper dbHelper) {
+        this.dbHelper=dbHelper;
         this.accounts = new HashMap<>();
     }
 
     @Override
     public List<String> getAccountNumbersList() {
-        return new ArrayList<>(accounts.keySet());
+        SQLiteDatabase db2 = dbHelper.getReadableDatabase();
+        List<String> array_list = new ArrayList<String>();
+        Cursor res =  db2.rawQuery( "select * from account_details", null );
+        res.moveToFirst();
+
+        while(res.isAfterLast() == false){
+            array_list.add(res.getString(res.getColumnIndex("account_number")));
+            res.moveToNext();
+        }
+        System.out.println(array_list);
+        return array_list;
+        //return new ArrayList<>(accounts.keySet());
     }
 
     @Override
@@ -58,7 +74,18 @@ public class InMemoryAccountDAO implements AccountDAO {
 
     @Override
     public void addAccount(Account account) {
-        accounts.put(account.getAccountNo(), account);
+        SQLiteDatabase db =this.dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("account_number", account.getAccountNo());
+        values.put("bank", account.getBankName());
+        values.put("account_holder", account.getAccountHolderName());
+        values.put("balance", account.getBalance());
+        long newRowId = db.insert("account_details", null, values);
+        System.out.println("New row added to the database");
+        System.out.println(newRowId);
+
+
+        //accounts.put(account.getAccountNo(), account);
     }
 
     @Override
@@ -72,20 +99,23 @@ public class InMemoryAccountDAO implements AccountDAO {
 
     @Override
     public void updateBalance(String accountNo, ExpenseType expenseType, double amount) throws InvalidAccountException {
-        if (!accounts.containsKey(accountNo)) {
-            String msg = "Account " + accountNo + " is invalid.";
-            throw new InvalidAccountException(msg);
-        }
-        Account account = accounts.get(accountNo);
+       // if (!accounts.containsKey(accountNo)) {
+       //     String msg = "Account " + accountNo + " is invalid.";
+       //     throw new InvalidAccountException(msg);
+       // }
+        //Account account = accounts.get(accountNo);
         // specific implementation based on the transaction type
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         switch (expenseType) {
             case EXPENSE:
-                account.setBalance(account.getBalance() - amount);
+                db.rawQuery( "update account_details set balance = balance-? where account_number=?", new String[] {Double.toString(amount),accountNo} );
+                //account.setBalance(account.getBalance() - amount);
                 break;
             case INCOME:
-                account.setBalance(account.getBalance() + amount);
+                db.rawQuery( "update account_details set balance = balance+? where account_number=?", new String[] {Double.toString(amount),accountNo} );
+                //account.setBalance(account.getBalance() + amount);
                 break;
         }
-        accounts.put(accountNo, account);
+       // accounts.put(accountNo, account);
     }
 }
