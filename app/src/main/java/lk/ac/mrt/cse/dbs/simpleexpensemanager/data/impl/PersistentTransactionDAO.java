@@ -98,13 +98,6 @@ public class PersistentTransactionDAO implements TransactionDAO {
 
     @Override
     public List<Transaction> getPaginatedTransactionLogs(int limit) {
-        //int size = transactions.size();
-        //if (size <= limit) {
-        //    return transactions;
-        //}
-        // return the last <code>limit</code> number of transaction logs
-        //return transactions.subList(size - limit, size);
-
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         List<Transaction> array_list = new ArrayList<Transaction>();
         Cursor res =  db.rawQuery( "select * from transactions limit ?", new String[] {Integer.toString(limit)}  );

@@ -67,6 +67,7 @@ public class PersistentAccountDAO implements AccountDAO {
     public Account getAccount(String accountNo) throws InvalidAccountException {
         SQLiteDatabase db =this.dbHelper.getWritableDatabase();
         Cursor res =  db.rawQuery( "select * from account_details", null );
+        res.moveToFirst();
         return new Account(
                 res.getString(res.getColumnIndex("account_number")),
                 res.getString(res.getColumnIndex("bank")),
@@ -88,8 +89,6 @@ public class PersistentAccountDAO implements AccountDAO {
         System.out.println("New row added to the database");
         System.out.println(newRowId);
 
-
-        //accounts.put(account.getAccountNo(), account);
     }
 
     @Override
